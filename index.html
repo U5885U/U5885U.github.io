@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <title>Доступ к камере</title>
+    </head>
+    <body>
+        <h1>Доступ к камере</h1>
+        <button id="startButton">Разрешить доступ к камере</button>
+        <video id="video" width="640" height="480" autoplay playsinline></video>
+        <p id="error-message" style="color: red;"></p>
+        <script>
+            const video = document.getElementById('video');
+            const errorMessage = document.getElementById('error-message');
+            const startButton = document.getElementById('startButton');
+            
+            startButton.addEventListener('click', async () => {
+                try {
+                    // Проверяем, является ли устройство мобильным
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                    
+                    const constraints = {
+                        video: {
+                            facingMode: isMobile ? { exact: 'environment' } : 'user',
+                            width: { ideal: 640 },
+                            height: { ideal: 480 }
+                        }
+                    };
+
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        throw new Error('API камеры не поддерживается в вашем браузере');
+                    }
+                    
+                    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    video.srcObject = stream;
+                    startButton.style.display = 'none';
+                } catch (error) {
+                    console.error("Ошибка доступа к камере: ", error);
+                    errorMessage.textContent = "Не удалось получить доступ к камере. Пожалуйста, проверьте разрешения.";
+                }
+            });
+        </script>
+    </body>
+</html>
